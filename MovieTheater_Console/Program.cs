@@ -1,6 +1,10 @@
-﻿using MovieTheater_Console;
+﻿using MovieTheater.Shared.Data.DB;
+using MovieTheater_Console;
 
-Dictionary<string, MovieTheater> MovieTheaterDict = new();
+Dictionary<string, MovieTheaterEntity> MovieTheaterDict = new();
+
+var MovieTheaterEntityDAL = new MovieTheaterEntityDAL(new MovieTheaterContext());
+var MovieEntityDAL = new MovieEntityDAL(new MovieTheaterContext());
 
 bool exit = false;
 while (!exit)
@@ -45,24 +49,20 @@ void MovieGet()
 {
     Console.Clear();
     Console.WriteLine("Listagem de filme\n");
-    Console.Write("Digite o cinema cujo filmes você quer listar: ");
-    string movieTheaterName = Console.ReadLine();
-    if (MovieTheaterDict.ContainsKey(movieTheaterName))
-    {
-        MovieTheater movieTheater = MovieTheaterDict[movieTheaterName];
-        movieTheater.ShowMovies();
-    }
-    else Console.WriteLine($"Cinema {movieTheaterName} não encontrado");
+
+    var movieEntityList = MovieEntityDAL.Read();
+
+    foreach (var movieTheaterEntity in movieEntityList) Console.WriteLine(movieTheaterEntity);
 }
 
 void MovieTheaterGet()
 {
     Console.Clear();
     Console.WriteLine("Listagem de cinemas\n");
-    foreach (var movieTheaters in MovieTheaterDict.Values)
-    {
-        Console.WriteLine(movieTheaters);
-    }
+
+    var movieTheaterEntityList = MovieTheaterEntityDAL.Read();
+
+    foreach(var movieTheaterEntity in movieTheaterEntityList) Console.WriteLine(movieTheaterEntity);
 }
 
 void MovieRegister()
@@ -71,15 +71,14 @@ void MovieRegister()
     Console.WriteLine("Registro de Filmes\n");
     Console.Write("Digite o cinema onde o filme vai ser exibido: ");
     string movieTheaterName = Console.ReadLine();
-    if (MovieTheaterDict.ContainsKey(movieTheaterName))
-    {
-        Console.Write($"Qual o nome do filme a ser exibido em {movieTheaterName}? ");
-        string movieName = Console.ReadLine();
-        MovieTheater movieTheater = MovieTheaterDict[movieTheaterName];
-        movieTheater.AddMovie(new Movie(movieName));
-        Console.WriteLine($"Filme {movieName} de {movieTheaterName} adicionado!");
-    }
-    else Console.WriteLine($"Cinema {movieTheaterName} não encontrado");
+    Console.Write($"Qual o nome do filme a ser exibido em {movieTheaterName}? ");
+    string movieName = Console.ReadLine();
+    Console.Write($"Qual a duração do filme {movieName}? ");
+    int movieDuration = int.Parse(Console.ReadLine());
+
+    MovieEntityDAL.Create(new MovieEntity(movieName, movieDuration));
+    Console.WriteLine($"Filme {movieName} de {movieTheaterName} adicionado!");
+
 }
 
 void MovieTheaterRegister()
@@ -90,7 +89,8 @@ void MovieTheaterRegister()
     string name = Console.ReadLine();
     Console.Write("Digite o endereço do cinema: ");
     string address = Console.ReadLine();
-    MovieTheater movieTheater = new MovieTheater(name, address);
-    MovieTheaterDict.Add(name, movieTheater);
+
+    MovieTheaterEntityDAL.Create(new MovieTheaterEntity(name, address));
+
     Console.WriteLine($"cinema {name} adicionado!");
 }

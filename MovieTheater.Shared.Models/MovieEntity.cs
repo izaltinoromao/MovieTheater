@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 
 namespace MovieTheater_Console
 {
-    internal class Movie
+    public class MovieEntity
     {
-        public Movie(string name)
+        public MovieEntity(string name, int duration)
         {
             Name = name;
+            Duration = duration;
         }
 
+        public int Id { get; set; }
         public string Name { get; set; }
         public int Duration { get; set; }
 

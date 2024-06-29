@@ -7,21 +7,22 @@ using System.Threading.Tasks;
 
 namespace MovieTheater_Console
 {
-    internal class MovieTheater
+    public class MovieTheaterEntity
     {
 
-        public MovieTheater(string name, string address)
+        public MovieTheaterEntity(string name, string address)
         {
             Name = name;
             Address = address;
         }
 
+        public int Id { get; set; }
         public string Name { get; set; }
         public string Address { get; set; }
 
-        public List<Movie> movies = new List<Movie>();
+        public List<MovieEntity> movies = new List<MovieEntity>();
 
-        public void AddMovie(Movie movie)
+        public void AddMovie(MovieEntity movie)
         {
             movies.Add(movie);
         }

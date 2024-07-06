@@ -3,8 +3,8 @@ using MovieTheater_Console;
 
 Dictionary<string, MovieTheaterEntity> MovieTheaterDict = new();
 
-var MovieTheaterEntityDAL = new MovieTheaterEntityDAL(new MovieTheaterContext());
-var MovieEntityDAL = new MovieEntityDAL(new MovieTheaterContext());
+var MovieTheaterEntityDAL = new DAL<MovieTheaterEntity>(new MovieTheaterContext());
+var MovieEntityDAL = new DAL<MovieEntity>(new MovieTheaterContext());
 
 bool exit = false;
 while (!exit)
@@ -49,10 +49,14 @@ void MovieGet()
 {
     Console.Clear();
     Console.WriteLine("Listagem de filme\n");
+    Console.Write("Digite o cinema cujo filmes você quer listar: ");
+    string movieTheaterName = Console.ReadLine();
+    var movieTheaterTarget = MovieTheaterEntityDAL.ReadBy(a => a.Name.Equals(movieTheaterName));
 
-    var movieEntityList = MovieEntityDAL.Read();
-
-    foreach (var movieTheaterEntity in movieEntityList) Console.WriteLine(movieTheaterEntity);
+    if (movieTheaterTarget is not null)
+    {
+        movieTheaterTarget.ShowMovies();
+    }
 }
 
 void MovieTheaterGet()
@@ -71,13 +75,22 @@ void MovieRegister()
     Console.WriteLine("Registro de Filmes\n");
     Console.Write("Digite o cinema onde o filme vai ser exibido: ");
     string movieTheaterName = Console.ReadLine();
-    Console.Write($"Qual o nome do filme a ser exibido em {movieTheaterName}? ");
-    string movieName = Console.ReadLine();
-    Console.Write($"Qual a duração do filme {movieName}? ");
-    int movieDuration = int.Parse(Console.ReadLine());
+    var targetMovieTheater = MovieTheaterEntityDAL.ReadBy(a => a.Name.Equals(movieTheaterName));
 
-    MovieEntityDAL.Create(new MovieEntity(movieName, movieDuration));
-    Console.WriteLine($"Filme {movieName} de {movieTheaterName} adicionado!");
+    if (targetMovieTheater is not null)
+    {
+        Console.Write($"Qual o nome do filme a ser exibido em {movieTheaterName}? ");
+        string movieName = Console.ReadLine();
+        Console.Write($"Qual a duração do filme {movieName}? ");
+        int movieDuration = int.Parse(Console.ReadLine());
+        //MovieEntityDAL.Create(new MovieEntity(movieName, movieDuration));
+
+        targetMovieTheater.AddMovie(new MovieEntity(movieName, movieDuration));
+        MovieTheaterEntityDAL.Update(targetMovieTheater);
+        
+        Console.WriteLine($"Filme {movieName} de {movieTheaterName} adicionado!");
+    }
+    else Console.WriteLine($"Cinema {movieTheaterName} não encontrado");
 
 }
 

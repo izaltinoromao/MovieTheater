@@ -17,6 +17,7 @@ namespace MovieTheater_Console
         public int Id { get; set; }
         public string Name { get; set; }
         public int Duration { get; set; }
+        public virtual MovieTheaterEntity? MovieTheaterEntity { get; set; }
 
         public override string ToString()
         {

@@ -20,17 +20,17 @@ namespace MovieTheater_Console
         public string Name { get; set; }
         public string Address { get; set; }
 
-        public List<MovieEntity> movies = new List<MovieEntity>();
+        public virtual ICollection<MovieEntity> Movies { get; set; }
 
         public void AddMovie(MovieEntity movie)
         {
-            movies.Add(movie);
+            Movies.Add(movie);
         }
 
         public void ShowMovies()
         {
-            Console.WriteLine($"Filmes passandro em {Name}:");
-            foreach (var movie in movies)
+            Console.WriteLine($"Filmes passando em {Name}:");
+            foreach (var movie in Movies)
             {
                 Console.WriteLine(movie);
             }

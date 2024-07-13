@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieTheater.Shared.Data.DB;
 
@@ -11,9 +12,11 @@ using MovieTheater.Shared.Data.DB;
 namespace MovieTheater.Shared.Data.Migrations
 {
     [DbContext(typeof(MovieTheaterContext))]
-    partial class MovieTheaterContextModelSnapshot : ModelSnapshot
+    [Migration("20240713185755_NewEntity2")]
+    partial class NewEntity2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,9 +35,6 @@ namespace MovieTheater.Shared.Data.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
 
                     b.Property<int?>("MovieTheaterEntityId")
                         .HasColumnType("int");
@@ -99,7 +99,7 @@ namespace MovieTheater.Shared.Data.Migrations
             modelBuilder.Entity("MovieTheater.Shared.Models.TicketEntity", b =>
                 {
                     b.HasOne("MovieTheater_Console.MovieTheaterEntity", "MovieTheaterEntity")
-                        .WithMany("Tickets")
+                        .WithMany()
                         .HasForeignKey("MovieTheaterEntityId");
 
                     b.Navigation("MovieTheaterEntity");
@@ -117,8 +117,6 @@ namespace MovieTheater.Shared.Data.Migrations
             modelBuilder.Entity("MovieTheater_Console.MovieTheaterEntity", b =>
                 {
                     b.Navigation("Movies");
-
-                    b.Navigation("Tickets");
                 });
 #pragma warning restore 612, 618
         }

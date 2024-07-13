@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using MovieTheater.EndPoints;
 using MovieTheater.Shared.Data.DB;
+using MovieTheater.Shared.Models;
 using MovieTheater_Console;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,7 @@ builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options =
 builder.Services.AddDbContext<MovieTheaterContext>();
 builder.Services.AddTransient<DAL<MovieTheaterEntity>>();
 builder.Services.AddTransient<DAL<MovieEntity>>();
+builder.Services.AddTransient<DAL<TicketEntity>>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -17,6 +19,7 @@ var app = builder.Build();
 
 app.AddEndPointsMovieTheater();
 app.AddEndPointsMovie();
+app.AddEndPointsTicket();
 
 app.UseSwagger();
 app.UseSwaggerUI();

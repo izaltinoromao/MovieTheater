@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MovieTheater.Shared.Data.DB;
 
@@ -11,9 +12,11 @@ using MovieTheater.Shared.Data.DB;
 namespace MovieTheater.Shared.Data.Migrations
 {
     [DbContext(typeof(MovieTheaterContext))]
-    partial class MovieTheaterContextModelSnapshot : ModelSnapshot
+    [Migration("20240713185646_NewEntity")]
+    partial class NewEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -24,31 +27,6 @@ namespace MovieTheater.Shared.Data.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("MovieTheater.Shared.Models.TicketEntity", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("MovieTheaterEntityId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("OwnerName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("MovieTheaterEntityId");
-
-                    b.ToTable("TicketEntity");
-                });
 
             modelBuilder.Entity("MovieTheater_Console.MovieEntity", b =>
                 {
@@ -96,15 +74,6 @@ namespace MovieTheater.Shared.Data.Migrations
                     b.ToTable("MovieTheaterEntity");
                 });
 
-            modelBuilder.Entity("MovieTheater.Shared.Models.TicketEntity", b =>
-                {
-                    b.HasOne("MovieTheater_Console.MovieTheaterEntity", "MovieTheaterEntity")
-                        .WithMany("Tickets")
-                        .HasForeignKey("MovieTheaterEntityId");
-
-                    b.Navigation("MovieTheaterEntity");
-                });
-
             modelBuilder.Entity("MovieTheater_Console.MovieEntity", b =>
                 {
                     b.HasOne("MovieTheater_Console.MovieTheaterEntity", "MovieTheaterEntity")
@@ -117,8 +86,6 @@ namespace MovieTheater.Shared.Data.Migrations
             modelBuilder.Entity("MovieTheater_Console.MovieTheaterEntity", b =>
                 {
                     b.Navigation("Movies");
-
-                    b.Navigation("Tickets");
                 });
 #pragma warning restore 612, 618
         }

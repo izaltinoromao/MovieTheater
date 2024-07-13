@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
+using MovieTheater.Shared.Models;
 
 namespace MovieTheater_Console
 {
@@ -22,9 +23,16 @@ namespace MovieTheater_Console
 
         public virtual ICollection<MovieEntity> Movies { get; set; }
 
+        public virtual ICollection<TicketEntity> Tickets { get; set; }
+
         public void AddMovie(MovieEntity movie)
         {
             Movies.Add(movie);
+        }
+
+        public void AddTicket(TicketEntity ticket)
+        {
+            Tickets.Add(ticket); 
         }
 
         public void ShowMovies()

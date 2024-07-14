@@ -26,10 +26,19 @@ namespace MovieTheater.EndPoints
                 return Results.Ok(EntityToResponse(movieEntity));
             });
 
-            app.MapPost("/Movie", ([FromServices] DAL<MovieEntity> dal, [FromBody] MovieRequest movieRequest) =>
+            app.MapPost("/Movie", ([FromServices] DAL<MovieEntity> movieDal, [FromServices] DAL <MovieTheaterEntity> theaterDal, [FromBody] MovieRequest movieRequest) =>
             {
-                var movieEntity = new MovieEntity(movieRequest.name, movieRequest.duration);
-                dal.Create(movieEntity);
+                ICollection<MovieTheaterEntity> movieTheaterEntityList = new List<MovieTheaterEntity>();
+
+                foreach (int theaterId in movieRequest.MovieTheaterIds)
+                {
+                    var movieTheater = theaterDal.ReadBy(t => t.Id == theaterId);
+                    if (movieTheater is null) return Results.NotFound();
+                    else movieTheaterEntityList.Add(movieTheater);
+                }
+
+                var movieEntity = new MovieEntity(movieRequest.name, movieRequest.duration, movieTheaterEntityList);
+                movieDal.Create(movieEntity);
                 return Results.Ok(EntityToResponse(movieEntity));
             });
 
@@ -62,8 +71,15 @@ namespace MovieTheater.EndPoints
                 movieEntity.Id,
                 movieEntity.Name ?? string.Empty,
                 movieEntity.Duration,
-                movieEntity.MovieTheaterEntity?.Id ?? 0,
-                movieEntity.MovieTheaterEntity?.Name ?? "No linked MovieTheater");
+                movieEntity.MovieTheaters?.Select(mt => mt.ToResponse()).ToList() ?? new List<MovieTheaterResponse>());
+        }
+
+        public static MovieTheaterResponse ToResponse(this MovieTheaterEntity entity)
+        {
+            return new MovieTheaterResponse(
+                entity.Id,
+                entity.Name ?? string.Empty,
+                entity.Address ?? string.Empty);
         }
     }
 }

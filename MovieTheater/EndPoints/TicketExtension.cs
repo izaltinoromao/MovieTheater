@@ -12,7 +12,11 @@ namespace MovieTheater.EndPoints
     {
         public static void AddEndPointsTicket(this WebApplication app)
         {
-            app.MapGet("/Ticket", ([FromServices] DAL<TicketEntity> dal) =>
+            var groupBuilder = app.MapGroup("ticket")
+                .RequireAuthorization()
+                .WithTags("Ticket");
+
+            groupBuilder.MapGet("", ([FromServices] DAL<TicketEntity> dal) =>
             {
                 var ticketEntityList = dal.Read();
                 if (ticketEntityList is null) return Results.NotFound();
@@ -20,14 +24,14 @@ namespace MovieTheater.EndPoints
                 return Results.Ok(ticketResponseList);
             });
 
-            app.MapGet("/Ticket/{id}", ([FromServices] DAL<TicketEntity> dal, int id) =>
+            groupBuilder.MapGet("/{id}", ([FromServices] DAL<TicketEntity> dal, int id) =>
             {
                 var ticketEntity = dal.ReadBy(a => a.Id == id);
                 if (ticketEntity is null) return Results.NotFound();
                 return Results.Ok(EntityToResponse(ticketEntity));
             });
 
-            app.MapPost("/Ticket", ([FromServices] DAL<TicketEntity> ticketDal, [FromServices] DAL <MovieTheaterEntity> movieTheaterDal, [FromBody] TicketRequest ticketRequest) =>
+            groupBuilder.MapPost("", ([FromServices] DAL<TicketEntity> ticketDal, [FromServices] DAL <MovieTheaterEntity> movieTheaterDal, [FromBody] TicketRequest ticketRequest) =>
             {
                 var movieTheaterEntity = movieTheaterDal.ReadBy(a => a.Id == ticketRequest.movieTheaterId);
                 if (movieTheaterEntity is null) return Results.NotFound();
@@ -36,7 +40,7 @@ namespace MovieTheater.EndPoints
                 return Results.Ok(EntityToResponse(ticketEntity));
             });
 
-            app.MapDelete("/Ticket/{id}", ([FromServices] DAL<TicketEntity> dal, int id) =>
+            groupBuilder.MapDelete("/{id}", ([FromServices] DAL<TicketEntity> dal, int id) =>
             {
                 var ticket = dal.ReadBy(m => m.Id == id);
                 if (ticket is null) return Results.NotFound();
@@ -44,7 +48,7 @@ namespace MovieTheater.EndPoints
                 return Results.NoContent();
             });
 
-            app.MapPut("/Ticket", ([FromServices] DAL<TicketEntity> ticketDal, [FromServices] DAL<MovieTheaterEntity> movieTheaterDal, [FromBody] TicketEditRequest ticketEditRequest) =>
+            groupBuilder.MapPut("", ([FromServices] DAL<TicketEntity> ticketDal, [FromServices] DAL<MovieTheaterEntity> movieTheaterDal, [FromBody] TicketEditRequest ticketEditRequest) =>
             {
                 var ticketToEdit = ticketDal.ReadBy(m => m.Id == ticketEditRequest.id);
                 if (ticketToEdit is null) return Results.NotFound();

@@ -11,7 +11,12 @@ namespace MovieTheater.EndPoints
     {
         public static void AddEndPointsMovie(this WebApplication app)
         {
-            app.MapGet("/Movie", ([FromServices] DAL<MovieEntity> dal) =>
+            var groupBuilder = app.MapGroup("movie")
+                .RequireAuthorization()
+                .WithTags("Movie");
+
+
+            groupBuilder.MapGet("", ([FromServices] DAL<MovieEntity> dal) =>
             {
                 var movieEntityList = dal.Read();
                 if (movieEntityList is null) return Results.NotFound();
@@ -19,14 +24,14 @@ namespace MovieTheater.EndPoints
                 return Results.Ok(movieResponseList);
             });
 
-            app.MapGet("/Movie/{id}", ([FromServices] DAL<MovieEntity> dal, int id) =>
+            groupBuilder.MapGet("/{id}", ([FromServices] DAL<MovieEntity> dal, int id) =>
             {
                 var movieEntity = dal.ReadBy(a => a.Id == id);
                 if (movieEntity is null) return Results.NotFound();
                 return Results.Ok(EntityToResponse(movieEntity));
             });
 
-            app.MapPost("/Movie", ([FromServices] DAL<MovieEntity> movieDal, [FromServices] DAL <MovieTheaterEntity> theaterDal, [FromBody] MovieRequest movieRequest) =>
+            groupBuilder.MapPost("", ([FromServices] DAL<MovieEntity> movieDal, [FromServices] DAL <MovieTheaterEntity> theaterDal, [FromBody] MovieRequest movieRequest) =>
             {
                 ICollection<MovieTheaterEntity> movieTheaterEntityList = new List<MovieTheaterEntity>();
 
@@ -42,7 +47,7 @@ namespace MovieTheater.EndPoints
                 return Results.Ok(EntityToResponse(movieEntity));
             });
 
-            app.MapDelete("/Movie/{id}", ([FromServices] DAL<MovieEntity> dal, int id) =>
+            groupBuilder.MapDelete("/{id}", ([FromServices] DAL<MovieEntity> dal, int id) =>
             {
                 var movie = dal.ReadBy(m => m.Id == id);
                 if (movie is null) return Results.NotFound();
@@ -50,7 +55,7 @@ namespace MovieTheater.EndPoints
                 return Results.NoContent();
             });
 
-            app.MapPut("/Movie", ([FromServices] DAL<MovieEntity> dal, [FromBody] MovieEditRequest movieEditRequest) =>
+            groupBuilder.MapPut("", ([FromServices] DAL<MovieEntity> dal, [FromBody] MovieEditRequest movieEditRequest) =>
             {
                 var movieToEdit = dal.ReadBy(m => m.Id == movieEditRequest.id);
                 if (movieToEdit is null) return Results.NotFound();

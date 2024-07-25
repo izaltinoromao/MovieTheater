@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using MovieTheater.Shared.Data.Models;
 using MovieTheater.Shared.Models;
 using MovieTheater_Console;
 
 namespace MovieTheater.Shared.Data.DB
 {
-    public class MovieTheaterContext : DbContext
+    public class MovieTheaterContext : IdentityDbContext<AccessUser, AccessRole, int>
     {
         public DbSet<MovieTheaterEntity> MovieTheaterEntity { get; set; }
         public DbSet<MovieEntity> MovieEntity { get; set; }
@@ -22,6 +24,11 @@ namespace MovieTheater.Shared.Data.DB
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(connectionString).UseLazyLoadingProxies();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
         }
 
     }

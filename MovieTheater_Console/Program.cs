@@ -85,7 +85,6 @@ void MovieRegister()
         int movieDuration = int.Parse(Console.ReadLine());
         //MovieEntityDAL.Create(new MovieEntity(movieName, movieDuration));
 
-        targetMovieTheater.AddMovie(new MovieEntity(movieName, movieDuration));
         MovieTheaterEntityDAL.Update(targetMovieTheater);
         
         Console.WriteLine($"Filme {movieName} de {movieTheaterName} adicionado!");

@@ -25,24 +25,6 @@ namespace MovieTheater_Console
 
         public virtual ICollection<TicketEntity> Tickets { get; set; }
 
-        public void AddMovie(MovieEntity movie)
-        {
-            Movies.Add(movie);
-        }
-
-        public void AddTicket(TicketEntity ticket)
-        {
-            Tickets.Add(ticket); 
-        }
-
-        public void ShowMovies()
-        {
-            Console.WriteLine($"Filmes passando em {Name}:");
-            foreach (var movie in Movies)
-            {
-                Console.WriteLine(movie);
-            }
-        }
 
         public override string ToString()
         {

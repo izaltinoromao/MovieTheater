@@ -28,6 +28,17 @@ namespace MovieTheater.EndPoints
                 return Results.Ok(EntityToResponse(movieTheaterEntity));
             });
 
+            groupBuilder.MapGet("/movies/{movieName}", async ([FromServices] DAL<MovieTheaterEntity> dal, string movieName) =>
+            {
+                var movieTheaterEntities = dal.Read();
+                var theatersWithMovie = movieTheaterEntities
+                    .Where(theater => theater.Movies.Any(movie => movie.Name.Equals(movieName, StringComparison.OrdinalIgnoreCase)))
+                    .ToList();
+
+                if (!theatersWithMovie.Any()) return Results.NotFound();
+                return Results.Ok(theatersWithMovie.Select(EntityToResponse));
+            });
+
             groupBuilder.MapPost("", ([FromServices] DAL<MovieTheaterEntity> dal, [FromBody] MovieTheaterRequest movieTheaterRequest) =>
             {
                 var movieTheaterEntity = new MovieTheaterEntity(movieTheaterRequest.name, movieTheaterRequest.address);

@@ -15,6 +15,7 @@ namespace MovieTheater.Shared.Data.DB
     public class MovieTheaterContext : IdentityDbContext<AccessUser, AccessRole, int>
     {
         public DbSet<MovieTheaterEntity> MovieTheaterEntity { get; set; }
+        public DbSet<ParkingDetailEntity> ParkingDetailEntity { get; set; }
         public DbSet<MovieEntity> MovieEntity { get; set; }
         public DbSet<TicketEntity> TicketEntity { get; set; }
 
@@ -29,6 +30,11 @@ namespace MovieTheater.Shared.Data.DB
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ParkingDetailEntity>()
+                .HasOne(pd => pd.MovieTheaterEntity)
+                .WithOne(mt => mt.ParkingDetailEntity)
+                .HasForeignKey<ParkingDetailEntity>(pd => pd.MovieTheaterId);
         }
 
     }

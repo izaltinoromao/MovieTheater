@@ -4,6 +4,7 @@ using MovieTheater_Console;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using MovieTheater.Responses;
+using MovieTheater.Shared.Models;
 
 namespace MovieTheater.EndPoints
 {
@@ -11,7 +12,9 @@ namespace MovieTheater.EndPoints
     {
         public static void AddEndPointsMovieTheater(this WebApplication app)
         {
-            var groupBuilder = app.MapGroup("movie-theater").RequireAuthorization().WithTags("MovieTheater");
+            var groupBuilder = app.MapGroup("movie-theater")
+                .RequireAuthorization()
+                .WithTags("MovieTheater");
 
             groupBuilder.MapGet("", ([FromServices] DAL<MovieTheaterEntity> dal) =>
             {
@@ -42,8 +45,11 @@ namespace MovieTheater.EndPoints
             groupBuilder.MapPost("", ([FromServices] DAL<MovieTheaterEntity> dal, [FromBody] MovieTheaterRequest movieTheaterRequest) =>
             {
                 var movieTheaterEntity = new MovieTheaterEntity(movieTheaterRequest.name, movieTheaterRequest.address);
+
                 dal.Create(movieTheaterEntity);
-                return Results.Ok(EntityToResponse(movieTheaterEntity));
+
+                var resourceUrl = $"/movie-theater/{movieTheaterEntity.Id}";
+                return Results.Created(resourceUrl ,EntityToResponse(movieTheaterEntity));
             });
 
             groupBuilder.MapDelete("/{id}", ([FromServices] DAL<MovieTheaterEntity> dal, int id) =>

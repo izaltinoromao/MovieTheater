@@ -55,7 +55,7 @@ void MovieGet()
 
     if (movieTheaterTarget is not null)
     {
-        movieTheaterTarget.ShowMovies();
+        //movieTheaterTarget.ShowMovies();
     }
 }
 

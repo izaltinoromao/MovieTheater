@@ -31,13 +31,18 @@ namespace MovieTheater.EndPoints
                 return Results.Ok(EntityToResponse(ticketEntity));
             });
 
-            groupBuilder.MapPost("", ([FromServices] DAL<TicketEntity> ticketDal, [FromServices] DAL <MovieTheaterEntity> movieTheaterDal, [FromBody] TicketRequest ticketRequest) =>
+            groupBuilder.MapPost("", ([FromServices] DAL<TicketEntity> ticketDal, 
+                [FromServices] DAL <MovieTheaterEntity> movieTheaterDal, 
+                [FromBody] TicketRequest ticketRequest) =>
             {
                 var movieTheaterEntity = movieTheaterDal.ReadBy(a => a.Id == ticketRequest.movieTheaterId);
                 if (movieTheaterEntity is null) return Results.NotFound();
                 var ticketEntity = new TicketEntity(ticketRequest.ownerName, movieTheaterEntity);
+
                 ticketDal.Create(ticketEntity);
-                return Results.Ok(EntityToResponse(ticketEntity));
+
+                var resourceUrl = $"/ticket/{ticketEntity.Id}";
+                return Results.Created(resourceUrl, EntityToResponse(ticketEntity));
             });
 
             groupBuilder.MapDelete("/{id}", ([FromServices] DAL<TicketEntity> dal, int id) =>
@@ -48,18 +53,22 @@ namespace MovieTheater.EndPoints
                 return Results.NoContent();
             });
 
-            groupBuilder.MapPut("", ([FromServices] DAL<TicketEntity> ticketDal, [FromServices] DAL<MovieTheaterEntity> movieTheaterDal, [FromBody] TicketEditRequest ticketEditRequest) =>
+            groupBuilder.MapPut("", ([FromServices] DAL<TicketEntity> ticketDal, 
+                [FromServices] DAL<MovieTheaterEntity> movieTheaterDal, [FromBody] 
+            TicketEditRequest ticketEditRequest) =>
             {
                 var ticketToEdit = ticketDal.ReadBy(m => m.Id == ticketEditRequest.id);
-                if (ticketToEdit is null) return Results.NotFound();
+                if (ticketToEdit is null) return Results.NotFound("Ticket not found");
 
                 var movieTheaterEntity = movieTheaterDal.ReadBy(a => a.Id == ticketEditRequest.movieTheaterId);
-                if (movieTheaterEntity is null) return Results.NotFound();
+                if (movieTheaterEntity is null) return Results.NotFound("Movie theater not found");
 
                 ticketToEdit.OwnerName = ticketEditRequest.ownerName;
                 ticketToEdit.MovieTheaterEntity = movieTheaterEntity;
+
                 ticketDal.Update(ticketToEdit);
-                return Results.Ok();
+
+                return Results.Ok(EntityToResponse(ticketToEdit));
             });
         }
 

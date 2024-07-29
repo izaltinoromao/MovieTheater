@@ -13,6 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.Configure<Microsoft.AspNetCore.Http.Json.JsonOptions>(options => options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 builder.Services.AddDbContext<MovieTheaterContext>();
 builder.Services.AddTransient<DAL<MovieTheaterEntity>>();
+builder.Services.AddTransient<DAL<ParkingDetailEntity>>();
 builder.Services.AddTransient<DAL<MovieEntity>>();
 builder.Services.AddTransient<DAL<TicketEntity>>();
 builder.Services.AddEndpointsApiExplorer();
@@ -25,6 +26,7 @@ var app = builder.Build();
 app.UseAuthorization();
 
 app.AddEndPointsMovieTheater();
+app.AddEndPointsParkingDetail();
 app.AddEndPointsMovie();
 app.AddEndPointsTicket();
 

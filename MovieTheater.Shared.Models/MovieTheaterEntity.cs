@@ -21,6 +21,8 @@ namespace MovieTheater_Console
         public string Name { get; set; }
         public string Address { get; set; }
 
+        public virtual ParkingDetailEntity ParkingDetailEntity { get; set; }
+
         public virtual ICollection<MovieEntity> Movies { get; set; }
 
         public virtual ICollection<TicketEntity> Tickets { get; set; }

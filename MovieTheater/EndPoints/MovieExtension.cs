@@ -38,13 +38,16 @@ namespace MovieTheater.EndPoints
                 foreach (int theaterId in movieRequest.MovieTheaterIds)
                 {
                     var movieTheater = theaterDal.ReadBy(t => t.Id == theaterId);
-                    if (movieTheater is null) return Results.NotFound();
+                    if (movieTheater is null) return Results.NotFound("Movie theater with id: " + theaterId + " not found.");
                     else movieTheaterEntityList.Add(movieTheater);
                 }
 
                 var movieEntity = new MovieEntity(movieRequest.name, movieRequest.duration, movieTheaterEntityList);
+
                 movieDal.Create(movieEntity);
-                return Results.Ok(EntityToResponse(movieEntity));
+
+                var resourceUrl = $"/movie/{movieEntity.Id}";
+                return Results.Created(resourceUrl, EntityToResponse(movieEntity));
             });
 
             groupBuilder.MapDelete("/{id}", ([FromServices] DAL<MovieEntity> dal, int id) =>

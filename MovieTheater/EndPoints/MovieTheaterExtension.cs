@@ -31,6 +31,38 @@ namespace MovieTheater.EndPoints
                 return Results.Ok(EntityToResponse(movieTheaterEntity));
             });
 
+            groupBuilder.MapGet("/details/{id}", ([FromServices] DAL<MovieTheaterEntity> dal, int id) =>
+            {
+                var movieTheaterEntity = dal.ReadBy(a => a.Id == id);
+                if (movieTheaterEntity is null) return Results.NotFound("Movie theater not found");
+
+
+                ParkingDetailMovieTheaterResponse parkingDetail = null;
+                if (movieTheaterEntity.ParkingDetailEntity != null)
+                {
+                    parkingDetail = new ParkingDetailMovieTheaterResponse(
+                        movieTheaterEntity.ParkingDetailEntity.Id,
+                        movieTheaterEntity.ParkingDetailEntity.NumberOfSpaces,
+                        movieTheaterEntity.ParkingDetailEntity.IsCovered,
+                        movieTheaterEntity.ParkingDetailEntity.HasEVChargingStations
+                    );
+                }
+
+                var moviesStaring = MovieEntityListToResponseList(movieTheaterEntity.Movies);
+                var validTickets = TicketEntityListToResponseList(movieTheaterEntity.Tickets);
+                validTickets = ValidateTicketsExpiration(validTickets);
+                
+                var movieTheaterDetailResponse = new MovieTheaterDetailResponse(movieTheaterEntity.Id,
+                    movieTheaterEntity.Name,
+                    movieTheaterEntity.Address,
+                    parkingDetail,
+                    moviesStaring,
+                    validTickets
+                    );
+
+                return Results.Ok(movieTheaterDetailResponse);
+            });
+
             groupBuilder.MapGet("/movies/{movieName}", async ([FromServices] DAL<MovieTheaterEntity> dal, string movieName) =>
             {
                 var movieTheaterEntities = dal.Read();
@@ -80,5 +112,40 @@ namespace MovieTheater.EndPoints
         {
             return new MovieTheaterResponse(movieTheaterEntity.Id, movieTheaterEntity.Name, movieTheaterEntity.Address);
         }
+        private static ICollection<MovieMovieTheaterResponse> MovieEntityListToResponseList(IEnumerable<MovieEntity> movieEntityList)
+        {
+            return movieEntityList.Select(m => MovieEntityToResponse(m)).ToList();
+        }
+
+        private static MovieMovieTheaterResponse MovieEntityToResponse(MovieEntity movieEntity)
+        {
+            return new MovieMovieTheaterResponse(movieEntity.Id, movieEntity.Name, movieEntity.Duration);
+        }
+
+        private static ICollection<TicketMovieTheaterResponse> TicketEntityListToResponseList(IEnumerable<TicketEntity> ticketEntityList)
+        {
+            return ticketEntityList.Select(t => TicketEntityToResponse(t)).ToList();
+        }
+
+        private static TicketMovieTheaterResponse TicketEntityToResponse(TicketEntity ticketEntity)
+        {
+            return new TicketMovieTheaterResponse(ticketEntity.Id, ticketEntity.OwnerName, ticketEntity.Date, ticketEntity.Date.AddDays(3));
+        }
+
+        private static ICollection<TicketMovieTheaterResponse> ValidateTicketsExpiration(ICollection<TicketMovieTheaterResponse> tickets)
+        {
+            List<TicketMovieTheaterResponse> validatedTickets = new List<TicketMovieTheaterResponse>();
+
+            foreach (var ticket in tickets)
+            {
+                if (ticket.expireAt >= DateTime.Now)
+                {
+                    validatedTickets.Add(ticket);
+                }
+            }
+
+            return validatedTickets;
+        }
+
     }
 }

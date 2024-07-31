@@ -36,8 +36,8 @@ This is a Movie Theater Management System developed in ASP.NET. It allows users 
 
 1. Clone the repository:
     ```bash
-    git clone https://github.com/yourusername/movietheater-management.git
-    cd movietheater-management
+    git clone https://github.com/izaltinoromao/MovieTheater
+    cd MovieTheater
     ```
 
 2. Install dependencies:
